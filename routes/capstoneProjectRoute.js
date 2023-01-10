@@ -33,10 +33,59 @@ router.post('/Login',(req,res)=>{ // user Login
     capstoneProjectController.userLogin(req,res)
 })
 
-router.post('/addPost',(req,res)=>{ // user Login
+router.post('/addPost',(req,res)=>{ // add post
     console.log("router here")
     capstoneProjectController.addPost(req,res)
 })
 
+router.put('/editPost',(req,res)=>{ // edit post
+    console.log("router here")
+    capstoneProjectController.editPost(req,res)
+})
+
+router.delete('/deletePost',(req,res)=>{ // delete post
+    console.log("router here")
+    capstoneProjectController.deletePost(req,res)
+})
+
+router.get('/filterByUsername',(req,res)=>{ // filter by username
+    console.log("router here")
+    capstoneProjectController.filterUsername(req,res)
+})
+
+router.post('/addFriends',(req,res)=>{ // add friends
+    console.log("router here")
+    capstoneProjectController.addFriends(req,res)
+})
+
+router.get('/searchFriends',(req,res)=>{ // search friends
+    console.log("router here")
+    capstoneProjectController.searchFriends(req,res)
+})
+
+router.get('/showAllFriends',(req,res)=>{ // display all friends
+    console.log("router here")
+    capstoneProjectController.showAllFriends(req,res)
+})
+
+router.get('/displayAllFriendsPost',(req,res)=>{ // edisplay all friends post on userhomepage
+    console.log("router here")
+    capstoneProjectController.allFriendsPostDisplay(req,res)
+})
+
+router.get('/displayPostByFriendName',(req,res)=>{ // display all friends post by friendname
+    console.log("router here")
+    capstoneProjectController.displayPostByFriendName(req,res)
+})
+
+router.get('/displayAllMarketplaceItems',(req,res)=>{ // display all marketplace items
+    console.log("router here")
+    capstoneProjectController.displayAllMarketplaceItems(req,res)
+})
+
+router.post('/addItemMarketplace',(req,res)=>{ // add items to marketplace
+    console.log("router here")
+    capstoneProjectController.addItemMarketplace(req,res)
+})
 
 module.exports = router; // export

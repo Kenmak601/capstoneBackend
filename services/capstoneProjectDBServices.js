@@ -69,7 +69,8 @@ let login = async (req, res)=>{ // CRUD - retrieve all data from User Details My
             {
                 if (password == result[0].password)
                 {
-                    resolve({status:"Login success"})
+                    resolve({status:"Login success",currentUser: result})
+
                 }
                 else
                 {
@@ -101,5 +102,163 @@ let newPost = async (req, res)=>{ // CRUD - create new post
     });
 }
 
+let updatePost = async (req, res)=>{ // CRUD - update post
+    console.log("update post to db here")
+    let postId = req.body.postId // req.body.(match front end)
+    let updatedTitle = req.body.postTitle
+    let updatedContent = req.body.postContent
+    
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `UPDATE user_post SET postTitle="${updatedTitle}", postContent="${updatedContent}" WHERE postId="${postId}"`; // **need to add the username in values**
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
 
-module.exports = {getAllDataFromUserDetails, getAllDataFromUserProfile, getAllDataFromUserPost, postNewUsersDetails, login, newPost}
+let deletePostFromDB = async (req, res)=>{ // CRUD - delete
+    
+    let postId = req.body.postId
+
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `DELETE FROM user_post WHERE postId = ${postId}`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let fetchByUsername = async (req, res)=>{ // CRUD - retrieve all data from User Details Mysql Table
+    console.log("db services All User Profile here")
+
+    let username = req.query.username
+
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `SELECT * FROM user_post WHERE username = "${username}" ORDER BY user_post.postDateTime DESC;`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let addFriendsToDB = async (req, res)=>{ // insert into user friends
+    console.log("db services All User Profile here")
+
+    let username = req.body.username
+    let friendName = req.body.friendUserName
+
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `INSERT INTO user_friends (loggedInUser, friendUsername) VALUES ("${username}", "${friendName}")`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let searchFriendsFromDB = async (req, res)=>{ // search keywords from title
+   
+    return new Promise((resolve, reject) => {
+
+        
+        let searchInput = req.query.searchInput
+        let sqlQuery = `SELECT * FROM user_details WHERE username LIKE "%${searchInput}%"`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let fetchAllFriendsFromDB = async (req, res)=>{ // search friendname from user_Friends db table according to logggedinUser
+    console.log("get all friends data here")
+
+    return new Promise((resolve, reject) => {
+
+        let loggedInUser = req.query.loggedInUser
+
+        let sqlQuery = `SELECT friendUsername FROM user_friends WHERE loggedInUser = "${loggedInUser}"`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let fetchFriendsPostFromDB = async (req, res)=>{ // CRUD - retrieve all post on friends list to show on homepage
+    console.log("get all friends data here")
+
+    return new Promise((resolve, reject) => {
+
+        let loggedInUser = req.query.loggedInUser
+
+        let sqlQuery = `SELECT user_post.postId, user_post.username, user_post.postTitle, user_post.postContent,user_post.postDateTime, user_friends.loggedInUser 
+                            FROM user_friends INNER JOIN user_post ON user_friends.friendUsername=user_post.username 
+                            WHERE user_friends.loggedInUser= "${loggedInUser}" ORDER BY user_post.postDateTime DESC;`;//CHANGE THIS SQL TO SHOW ALL FRIENDS POST ON HOMEPAGE
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let fetchPostByFriendNameFromDB = async (req, res)=>{ // show all post from friend after friendUsername button is pressed
+    console.log("display post by friend name data here")
+
+    return new Promise((resolve, reject) => {
+
+        let username = req.query.username
+
+        let sqlQuery = `SELECT * FROM user_post WHERE username = "${username}" ORDER BY user_post.postDateTime DESC`; 
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let fetchAllMarketplaceItems = async (req, res)=>{ // CRUD - retrieve all data from User Details Mysql Table
+    console.log("db services All User Details here")
+
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `SELECT * FROM marketplace`;
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+let addItemtoDB = async (req, res)=>{ // CRUD - create new post
+    console.log("add item to db here")
+    let itemName = req.body.itemName
+    let itemDescription = req.body.itemDescription
+    let itemPrice = req.body.itemPrice
+    let itemImage = req.body.itemImage
+    let itemLink = req.body.itemLink
+    
+    return new Promise((resolve, reject) => {
+        let sqlQuery = `INSERT INTO marketplace(itemName, itemDescription, itemPrice, itemImage, itemLink) VALUES ("${itemName}","${itemDescription}","${itemPrice}","${itemImage}","${itemLink}")`; 
+        
+        sql.query(sqlQuery, (err, result, field) => {
+            if(err) return reject(err);
+            resolve(Object.values(result));
+        });
+    });
+}
+
+module.exports = {getAllDataFromUserDetails, getAllDataFromUserProfile, getAllDataFromUserPost, postNewUsersDetails, login, newPost, 
+                    updatePost, deletePostFromDB, fetchByUsername, addFriendsToDB, searchFriendsFromDB, fetchAllFriendsFromDB, 
+                    fetchFriendsPostFromDB, fetchPostByFriendNameFromDB, fetchAllMarketplaceItems, addItemtoDB}
